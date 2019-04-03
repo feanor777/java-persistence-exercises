@@ -77,8 +77,8 @@ public class ProductDaoImpl implements ProductDao {
     }
 
     private List<Product> findAllProducts(Connection connection) throws SQLException {
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(SELECT_ALL_SQL);
+        PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_SQL);
+        ResultSet resultSet = preparedStatement.executeQuery();
         return collectToList(resultSet);
     }
 
