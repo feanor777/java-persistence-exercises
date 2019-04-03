@@ -156,10 +156,9 @@ public class ProductDaoImpl implements ProductDao {
         executeUpdateById(updateStatement, product.getId());
     }
 
-    private void executeUpdateById(PreparedStatement insertStatement, Long productId) throws SQLException {
-        int rowsAffected = insertStatement.executeUpdate(); // returns number of rows that were changed
-        if (rowsAffected == 0) {
-            throw new DaoOperationException(String.format("Product with id = %d does not exist", productId));
+    private void checkIdIsNotNull(Product product) {
+        if (product.getId() == null) {
+            throw new DaoOperationException("Product id cannot be null");
         }
     }
 
@@ -171,6 +170,13 @@ public class ProductDaoImpl implements ProductDao {
             return updateStatement;
         } catch (Exception e) {
             throw new DaoOperationException(String.format("Cannot prepare update statement for product: %s", product), e);
+        }
+    }
+
+    private void executeUpdateById(PreparedStatement insertStatement, Long productId) throws SQLException {
+        int rowsAffected = insertStatement.executeUpdate(); // returns number of rows that were changed
+        if (rowsAffected == 0) {
+            throw new DaoOperationException(String.format("Product with id = %d does not exist", productId));
         }
     }
 
@@ -197,12 +203,6 @@ public class ProductDaoImpl implements ProductDao {
             return removeStatement;
         } catch (SQLException e) {
             throw new DaoOperationException(String.format("Cannot prepare statement for product: %s", product), e);
-        }
-    }
-
-    private void checkIdIsNotNull(Product product) {
-        if (product.getId() == null) {
-            throw new DaoOperationException("Product id cannot be null");
         }
     }
 }
