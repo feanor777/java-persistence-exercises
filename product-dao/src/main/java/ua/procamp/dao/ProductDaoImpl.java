@@ -70,7 +70,7 @@ public class ProductDaoImpl implements ProductDao {
          Statement statement = connection.createStatement();
          ResultSet resultSet = statement.executeQuery(SELECT_ALL_PRODUCTS)) {
       while (resultSet.next()) {
-        Product p = getProduct(resultSet);
+        Product p = toProduct(resultSet);
         products.add(p);
       }
     } catch (SQLException e) {
@@ -86,7 +86,7 @@ public class ProductDaoImpl implements ProductDao {
       preparedStatement.setLong(1, id);
       try (ResultSet resultSet = preparedStatement.executeQuery()) {
         if (resultSet.next()) {
-          return getProduct(resultSet);
+          return toProduct(resultSet);
         }
       }
     } catch (SQLException e) {
@@ -137,7 +137,7 @@ public class ProductDaoImpl implements ProductDao {
     preparedStatement.setLong(5, product.getId());
   }
 
-  private Product getProduct(ResultSet resultSet) throws SQLException {
+  private Product toProduct(ResultSet resultSet) throws SQLException {
     Product p = new Product();
     p.setId(resultSet.getLong("id"));
     p.setName(resultSet.getString("name"));
