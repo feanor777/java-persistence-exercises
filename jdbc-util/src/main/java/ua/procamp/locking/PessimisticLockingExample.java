@@ -44,8 +44,9 @@ public class PessimisticLockingExample {
   private static int updateNameByIdAndVersion(int id, long version, Connection connection) throws SQLException {
     PreparedStatement updateStatement = connection.prepareStatement(UPDATE_PROGRAM_SQL);
     updateStatement.setString(1, "test program 2");
-    updateStatement.setInt(2, id);
-    updateStatement.setLong(3, version);
+    updateStatement.setLong(2, version + 1);
+    updateStatement.setInt(3, id);
+    updateStatement.setLong(4, version);
     return updateStatement.executeUpdate();
   }
 

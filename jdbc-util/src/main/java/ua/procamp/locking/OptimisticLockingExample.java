@@ -37,8 +37,9 @@ public class OptimisticLockingExample {
     try (Connection connection = SqlUtils.postgresDataSource.getConnection();
          PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_PROGRAM_SQL)) {
       preparedStatement.setString(1, "test program 2");
-      preparedStatement.setInt(2, id);
-      preparedStatement.setLong(3, version);
+      preparedStatement.setLong(2, version + 1);
+      preparedStatement.setInt(3, id);
+      preparedStatement.setLong(4, version);
       int updated = preparedStatement.executeUpdate();
       if (updated != 1) {
         throw new IllegalArgumentException("The version of the program should be " + version);
