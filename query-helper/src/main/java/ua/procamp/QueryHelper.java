@@ -4,31 +4,52 @@ import ua.procamp.exception.QueryHelperException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+
 import java.util.function.Function;
 
 /**
- * {@link QueryHelper} provides a util method that allows to perform read operations in the scope of transaction
+ * {@link QueryHelper} provides a util method that allows to perform read operations in the scope of
+ * transaction
  */
 public class QueryHelper {
-    private EntityManagerFactory entityManagerFactory;
+  private EntityManagerFactory entityManagerFactory;
 
-    public QueryHelper(EntityManagerFactory entityManagerFactory) {
-        this.entityManagerFactory = entityManagerFactory;
-    }
+  public QueryHelper(EntityManagerFactory entityManagerFactory) {
+    this.entityManagerFactory = entityManagerFactory;
+  }
 
-    /**
-     * Receives a {@link Function<EntityManager, T>}, creates {@link EntityManager} instance, starts transaction,
-     * performs received function and commits the transaction, in case of exception in rollbacks the transaction and
-     * throws a {@link QueryHelperException} with the following message: "Error performing query. Transaction is rolled back"
-     * <p>
-     * The purpose of this method is to perform read operations using {@link EntityManager}, so it uses read only mode
-     * by default.
-     *
-     * @param entityManagerConsumer query logic encapsulated as function that receives entity manager and returns result
-     * @param <T>                   generic type that allows to specify single entity class of some collection
-     * @return query result specified by type T
-     */
-    public <T> T readWithinTx(Function<EntityManager, T> entityManagerConsumer) {
-        throw new UnsupportedOperationException("I'm waiting for you to do your job and make me work ;)"); // todo:
+  /**
+   * Receives a {@link Function<EntityManager, T>}, creates {@link EntityManager} instance, starts
+   * transaction, performs received function and commits the transaction, in case of exception in
+   * rollbacks the transaction and throws a {@link QueryHelperException} with the following message:
+   * "Error performing query. Transaction is rolled back"
+   * <p>
+   * The purpose of this method is to perform read operations using {@link EntityManager}, so it
+   * uses read only mode by default.
+   *
+   * @param entityManagerConsumer query logic encapsulated as function that receives entity manager
+   *                              and returns result
+   * @param <T>                   generic type that allows to specify single entity class of some
+   *                              collection
+   * @return query result specified by type T
+   */
+  public <T> T readWithinTx(Function<EntityManager, T> entityManagerConsumer) {
+    EntityManager entityManager = entityManagerFactory.createEntityManager();
+    EntityTransaction transaction = entityManager.getTransaction();
+    try {
+      transaction.begin();
+      T result = entityManagerConsumer.apply(entityManager);
+      entityManager.detach(result);
+      transaction.commit();
+      return result;
+    } catch (Exception e) {
+      if (transaction != null && transaction.isActive()) {
+        transaction.rollback();
+      }
+      throw new QueryHelperException("Transaction is rolled back", e);
+    } finally {
+      entityManager.close();
     }
+  }
 }
