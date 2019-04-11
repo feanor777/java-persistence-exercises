@@ -1,9 +1,23 @@
 package ua.procamp.model;
 
+import org.hibernate.annotations.CreationTimestamp;
+
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * todo:
@@ -21,9 +35,23 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
+@Entity
+@NoArgsConstructor
+@EqualsAndHashCode(of = "id")
+@Table(name = "photo_comment")
 public class PhotoComment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column(name = "text", nullable = false)
     private String text;
+
+    @Column
+    @CreationTimestamp
     private LocalDateTime createdOn;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "photo_id")
     private Photo photo;
 }
